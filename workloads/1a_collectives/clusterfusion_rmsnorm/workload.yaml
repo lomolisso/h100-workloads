@@ -1,0 +1,15 @@
+name: clusterfusion_rmsnorm
+class: 1a
+collective: "symmetric (scalar AllReduce)"
+cluster_size: "2"
+dsmem_use: "Each row is split across two CTAs, which combine the row's sum of squares in one round of remote atomicAdd."
+submodule: third_party/ClusterFusion
+repo: https://github.com/xinhao-luo/ClusterFusion
+sources:   # relative to upstream/
+  - include/H100/norm/kernel.cuh
+entry_kernel: "RMSNormKernel"
+paper_title: "ClusterFusion: Expanding Operator Fusion Scope for LLM Inference via Cluster-Level Collective Primitive"
+paper_url: "https://proceedings.neurips.cc/paper_files/paper/2025/hash/3760d0ea4709a913a4804f4b4c073836-Abstract-Conference.html"
+publication_status: "peer-reviewed (NeurIPS 2025)"
+h100_shapes:   # shapes we ran on the H100
+  s0: {rows: 64, hidden: 8192}

@@ -1,0 +1,17 @@
+name: credit_pearson_backward
+class: 1b
+collective: "none beyond a trivial AllReduce of 1-5 scalars (direct replicated push)"
+cluster_size: "2, 4, 8"
+dsmem_use: "One row is spread over the shared memory of P CTAs, so the cluster acts as a bigger block with more SMEM. It also runs an AllReduce of 1-5 row statistics, which is why it is 1b only under the definition 'no collective, or only a trivial scalar one'."
+submodule: third_party/CREDIT
+repo: https://github.com/zhengxiongli08/CREDIT
+sources:   # relative to upstream/
+  - src/workloads/pearson_backward.cu
+entry_kernel: "cluster_bwd_staged_kernel"
+paper_title: "CREDIT: Cost-guided Reduction-reuse with Efficient DSMEM Inter-CTA Tiling"
+paper_url: "https://arxiv.org/abs/2609.01864"
+publication_status: "arXiv preprint"
+h100_shapes:   # shapes we ran on the H100
+  n4k: {rows: 4096, cols: 4096}
+  n16k: {rows: 4096, cols: 16384}
+  n64k: {rows: 4096, cols: 65536}

@@ -1,0 +1,21 @@
+name: clusterfusion_llama2_7b_decoder
+class: 1a
+collective: "symmetric (AllReduce)"
+cluster_size: "4"
+dsmem_use: "QKV projection, attention and output projection fused into one kernel, with one cluster per attention head. Partial results are combined by AllReduce: remote atomicAdd or fmaxf stores for scalars, bulk push with mbarrier for vectors."
+submodule: third_party/ClusterFusion
+repo: https://github.com/xinhao-luo/ClusterFusion
+sources:   # relative to upstream/
+  - include/H100/llama/kernel_sglang.cuh
+  - include/H100/llama/llama_kernel_sglang_dispatch.cu
+  - include/dsm.cuh
+entry_kernel: "LlamaDecoderLayerKernel"
+paper_title: "ClusterFusion: Expanding Operator Fusion Scope for LLM Inference via Cluster-Level Collective Primitive"
+paper_url: "https://proceedings.neurips.cc/paper_files/paper/2025/hash/3760d0ea4709a913a4804f4b4c073836-Abstract-Conference.html"
+publication_status: "peer-reviewed (NeurIPS 2025)"
+h100_shapes:   # shapes we ran on the H100
+  s1k: {hidden: 4096, heads: 32, head_dim: 128, seq_len: 1024, ffn: 11008}
+  s4k: {hidden: 4096, heads: 32, head_dim: 128, seq_len: 4096, ffn: 11008}
+  s16k: {hidden: 4096, heads: 32, head_dim: 128, seq_len: 16384, ffn: 11008}
+patches:   # correctness fixes, applied to the submodule at build time
+  - patches/clusterfusion__residual_out_c4_fix.patch

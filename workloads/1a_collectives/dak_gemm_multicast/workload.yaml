@@ -1,0 +1,23 @@
+name: dak_gemm_multicast
+class: 1a
+collective: "rooted (TMA multicast)"
+cluster_size: "2"
+dsmem_use: "Rank 0 TMA-multicasts each 8 KB weight tile to both CTAs of a cluster, with remote mbarrier arrive for back-pressure. Runs on wgmma."
+submodule: third_party/DirectAccessKernel
+repo: https://github.com/shouxulin/DirectAccessKernel
+sources:   # relative to upstream/
+  - include/task/gemv_multicast.cuh
+entry_kernel: "gemv_multicast"
+paper_title: "DAK: Direct-Access-Enabled GPU Memory Offloading with Optimal Efficiency for LLM Inference"
+paper_url: "https://doi.org/10.48550/arXiv.2604.26074"
+publication_status: "arXiv preprint"
+h100_shapes:   # shapes we ran on the H100
+  llama_qo_t512: {tokens: 512, m: 4096, k: 4096}
+  llama_qo_t1024: {tokens: 1024, m: 4096, k: 4096}
+  llama_up_t1024: {tokens: 1024, m: 11008, k: 4096}
+  llama_down_t1024: {tokens: 1024, m: 4096, k: 11008}
+  opt30b_qo_t512: {tokens: 512, m: 7168, k: 7168}
+  opt30b_fc1_t512: {tokens: 512, m: 28672, k: 7168}
+patches:   # correctness fixes, applied to the submodule at build time
+  - patches/dak_gemm_multicast__sync_fix.patch
+notes: "Builds against CUTLASS headers; third_party/hpc-ops/3rd/cutlass/include supplies them."

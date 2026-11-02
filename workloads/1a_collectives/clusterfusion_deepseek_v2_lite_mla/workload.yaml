@@ -1,0 +1,18 @@
+name: clusterfusion_deepseek_v2_lite_mla
+class: 1a
+collective: "symmetric (AllReduce, AllGather)"
+cluster_size: "4"
+dsmem_use: "Fused multi-head latent attention decoder step, with one cluster per head. AllReduce as in the Llama kernel, plus an AllGather by direct shift bulk push."
+submodule: third_party/ClusterFusion
+repo: https://github.com/xinhao-luo/ClusterFusion
+sources:   # relative to upstream/
+  - include/H100/deepseek/kernel.cuh
+  - include/dsm.cuh
+entry_kernel: "DeepSeekDecoderLayerKernel"
+paper_title: "ClusterFusion: Expanding Operator Fusion Scope for LLM Inference via Cluster-Level Collective Primitive"
+paper_url: "https://proceedings.neurips.cc/paper_files/paper/2025/hash/3760d0ea4709a913a4804f4b4c073836-Abstract-Conference.html"
+publication_status: "peer-reviewed (NeurIPS 2025)"
+h100_shapes:   # shapes we ran on the H100
+  s4k: {hidden: 2048, heads: 16, nope: 128, rope: 64, lora: 512, seq_len: 4096}
+patches:   # correctness fixes, applied to the submodule at build time
+  - patches/clusterfusion__residual_out_c4_fix.patch

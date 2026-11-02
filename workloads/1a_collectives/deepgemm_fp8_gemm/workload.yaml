@@ -1,0 +1,20 @@
+name: deepgemm_fp8_gemm
+class: 1a
+collective: "rooted (TMA multicast)"
+cluster_size: "2 where DeepGEMM's heuristic picks it, otherwise 1"
+dsmem_use: "Two CTAs compute adjacent output tiles sharing an A or B tile. Rank 0 TMA-multicasts the shared tile to both, with pairwise remote arrives. Runs on wgmma with fp8 inputs."
+submodule: third_party/DeepGEMM
+repo: https://github.com/deepseek-ai/DeepGEMM
+sources:   # relative to upstream/
+  - deep_gemm/include/deep_gemm/impls/sm90_fp8_gemm_1d2d.cuh
+entry_kernel: "sm90_fp8_gemm_1d2d_impl (JIT-instantiated)"
+paper_title: null
+paper_url: null
+publication_status: "no paper (open-source library)"
+h100_shapes:   # shapes we ran on the H100
+  m4096_n4096_k7168: {m: 4096, n: 4096, k: 7168, groups: 1}
+  m4096_n7168_k2048: {m: 4096, n: 7168, k: 2048, groups: 1}
+  m4096_n2112_k7168: {m: 4096, n: 2112, k: 7168, groups: 1}
+  m4096_n24576_k1536: {m: 4096, n: 24576, k: 1536, groups: 1}
+  grouped_8x4096: {m: 4096, n: 4096, k: 4096, groups: 8}
+notes: "Needs the nested submodules third-party/cutlass and third-party/deep_jit to build. This is DeepGEMM itself, not ExpertPlex's Adaptive Persistent Kernel, which has no public artifact."

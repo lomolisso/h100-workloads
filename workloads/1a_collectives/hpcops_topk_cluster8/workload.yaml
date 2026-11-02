@@ -1,0 +1,18 @@
+name: hpcops_topk_cluster8
+class: 1a
+collective: "symmetric and rooted (AllReduce, gather to rank 0)"
+cluster_size: "8"
+dsmem_use: "Eight CTAs work on one long row. They AllReduce a 2048-bin histogram (pull reduce-scatter, push all-gather), then gather the selected entries to rank 0."
+submodule: third_party/hpc-ops
+repo: https://github.com/Tencent/hpc-ops
+sources:   # relative to upstream/
+  - src/topk/topk_filtered.cu
+entry_kernel: "topk_filtered_cluster8_exact_kernel"
+paper_title: "Sample-Guided Exact Top-K Selection for Long-Context Sparse Attention"
+paper_url: "https://arxiv.org/abs/2609.08450"
+publication_status: "arXiv preprint"
+h100_shapes:   # shapes we ran on the H100
+  m8_n32k: {m: 8, n: 32768, k: 2048}
+  m16_n64k: {m: 16, n: 65536, k: 2048}
+  m8_n240k: {m: 8, n: 244650, k: 2048}
+notes: "This covers only the library's cluster-8 exact path, not its sampled paths, which are the paper's main idea."
